@@ -174,6 +174,23 @@ function format_storage_info($disk_space, $disk_free, $disk_name){
 
 }
 
+function format_temperature_info($temperature){
+	$str = "";
+	$temperature = round($temperature, 3);
+		$str .= '<div class="col p-0 d-inline-flex">';
+		$str .= "<span class='mr-2'>" .' '. $temperature ."℃</span>";
+		$str .= '
+<div class="progress flex-grow-1 align-self-center">
+  <div class="progress-bar progress-bar-striped progress-bar-animated ';
+		$str .= 'bg-' . percent_to_color($temperature) .'
+  " role="progressbar" style="width: '.$temperature.'%;" aria-valuenow="'.$temperature.'" aria-valuemin="0" aria-valuemax="100">'.$temperature.'℃</div>
+</div>
+</div>		';
+
+	return $str;
+
+}
+
 function get_disk_free_status($disks){
 	$str="";
 	$max = 5;
@@ -241,9 +258,16 @@ $disks = array();
 $disks[] = array("name" => "local" , "path" => getcwd()) ;
 // $disks[] = array("name" => "Your disk name" , "path" => '/mount/point/to/that/disk') ;
 
+$cpuTemp0 = "";
+
+exec("cat /sys/class/thermal/thermal_zone0/temp", $cpuTemp5, $status);
+exec("/usr/bin/vcgencmd measure_temp 2>&1", $gpuTemp5, $status);
+$cpu_temperature = $cpuTemp5[0]/1000;
+$gpu_temperature = (float)substr($gpuTemp5[0], 5, 8);
 
 $data1 .= "<tr><td>Disk free        </td><td>" . get_disk_free_status($disks) . "</td></tr>";
-
+$data1 .= "<tr><td>CPU temperature  </td><td>" . format_temperature_info($cpu_temperature) . "</td></tr>";
+$data1 .= "<tr><td>GPU temperature  </td><td>" . format_temperature_info($gpu_temperature) . "</td></tr>";
 $data1 .= "<tr><td>RAM free        </td><td>". format_storage_info($total_mem *1024, $free_mem *1024, '') ."</td></tr>";
 $data1 .= "<tr><td>Top RAM user    </td><td><small>$top_mem</small></td></tr>";
 $data1 .= "<tr><td>Top CPU user    </td><td><small>$top_cpu</small></td></tr>";
@@ -260,6 +284,27 @@ echo $data1;
 * ===============================================================================s
 */
 
+$data2 = "";
+$data2 .=  '
+<div class="card mb-2">
+  <h4 class="card-header text-center">
+    vnstat Network traffic 5 minutes
+  </h4>
+  <div class="card-body text-center">
+';
+
+
+$data2 .="<span class=' d-block'><pre class='d-inline-block text-left'><small>";
+$traffic_arr = array();
+exec('vnstat -5', $traffic_arr, $status);
+
+$traffic = implode("\n", $traffic_arr);
+
+$data2 .="$traffic</small></pre></span>";
+
+echo $data2;
+
+echo "</div>";
 
 if (!isset($_GET['showtraffic']) || $_GET['showtraffic'] ==  false) die();
 
