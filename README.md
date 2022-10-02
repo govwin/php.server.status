@@ -37,3 +37,9 @@ information, you will request the URL
 ```
 checkup.php?showtraffic=m
 ```
+
+## Raspberry Pi
+If when running `vcgencmd` on a **raspberry pi** you get VCHI initialization failed then you need to add the video group to your user. The `vcgencmd` tool requires you have this group role so without it, it will give `VCHI initialization failed` error.
+```
+sudo usermod -aG video www-data
+```
