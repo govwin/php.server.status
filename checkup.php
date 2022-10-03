@@ -296,8 +296,8 @@ $data1 .= "<tr><td>Top RAM user    </td><td><small>$top_mem</small></td></tr>";
 $data1 .= "<tr><td>Top CPU user    </td><td><small>$top_cpu</small></td></tr>";
 
 $data1 .= "</table>";
-// $data1 .= '  </div></div>';
-$data1 .= '  </div>';
+$data1 .= '  </div></div>';
+//$data1 .= '  </div>';
 echo $data1;  
 
 /* =============================================================================
@@ -324,10 +324,9 @@ exec('vnstat -5', $traffic_arr, $status);
 $traffic = implode("\n", $traffic_arr);
 
 $data2 .="$traffic</small></pre></span>";
-
+$data2 .= '  </div></div>';
+//$data2 .= "</div>";
 echo $data2;
-
-echo "</div>";
 
 if (!isset($_GET['showtraffic']) || $_GET['showtraffic'] ==  false) die();
 
@@ -363,7 +362,8 @@ estimated    371.92 GiB |    1.92 TiB |    2.29 TiB |
 $traffic = implode("\n", $traffic_arr);
 
 $data2 .="$traffic</small></pre></span>";
-
+$data2 .= '  </div></div>';
+//$data2 .= "</div>";
 echo $data2;
 ?>
-</div></html>
+</html>
