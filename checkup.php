@@ -85,15 +85,38 @@ $services[] = array("port" => "58846",     "service" => "Deluge",             	"
 $services[] = array("port" => "8112",     "service" => "Deluge Web",             	"ip" => "") ;
 $services[] = array("port" => "80",       "service" => "Internet Connection",     "ip" => "google.com") ;
 $services[] = array("port" => "8083",     "service" => "Vesta panel",             	"ip" => "") ;
+$services[] = array("port" => "5900",     "service" => "VNC",             	"ip" => "") ;
+$services[] = array("port" => "68",     "service" => "DHCP/Bootstrap Protocol Client",             	"ip" => "") ;
+$services[] = array("port" => "69",     "service" => "TFTP",             	"ip" => "") ;
 
+//test user
+//exec("whoami", $user, $status);
+//var_dump($user[0]);
+
+$allports = array();
+exec("sudo netstat -tulpn 2>&1", $allports, $status);
+
+$separator = "\n";
+$ports_and_porgram_string = implode($separator, $allports);
+
+//$pattern = "/\:(\d+).\\s/";
+//$result = preg_grep($pattern, $allports, 0);
+//preg_match_all($pattern, $ports_and_porgram_string, $result);
+
+$pattern = "/((tcp|udp)[6]{0,1})\s.*?\:(\d+).\s.*?\s\d+\/(.*?)(\n|$)/";
+preg_match_all($pattern, $ports_and_porgram_string, $result);
+
+for ($i = 0; $i < sizeof($result[0]); $i++) {
+	$services[] = array("port" => $result[3][$i], "protocol" => $result[1][$i],     "service" => $result[4][$i],             	"ip" => "") ;
+}
 
 //begin table for status
-$data .= "<small><table  class='table table-striped table-sm '><thead><tr><th>Service</th><th>Port</th><th>Status</th></tr></thead>";
+$data .= "<small><table  class='table table-striped table-sm '><thead><tr><th>Service</th><th>Protocol</th><th>Port</th><th>Status</th></tr></thead>";
 foreach ($services  as $service) {
 	if($service['ip']==""){
 	   $service['ip'] = "localhost";
 	}
-	$data .= "<tr><td>" . $service['service'] . "</td><td>". $service['port'];
+	$data .= "<tr><td>" . $service['service'] . "</td><td>". $service['protocol'] . "</td><td>". $service['port'];
 
 	$fp = @fsockopen($service['ip'], $service['port'], $errno, $errstr, $timeout);
 	if (!$fp) {
@@ -261,9 +284,9 @@ $disks[] = array("name" => "local" , "path" => getcwd()) ;
 $cpuTemp0 = "";
 
 exec("cat /sys/class/thermal/thermal_zone0/temp", $cpuTemp5, $status);
-exec("/usr/bin/vcgencmd measure_temp 2>&1", $gpuTemp5, $status);
+exec("/usr/bin/vcgencmd measure_temp 2>&1", $gpuTemp11, $status);
 $cpu_temperature = $cpuTemp5[0]/1000;
-$gpu_temperature = (float)substr($gpuTemp5[0], 5, 8);
+$gpu_temperature = (float)substr($gpuTemp11[0], 5, 8);
 
 $data1 .= "<tr><td>Disk free        </td><td>" . get_disk_free_status($disks) . "</td></tr>";
 $data1 .= "<tr><td>CPU temperature  </td><td>" . format_temperature_info($cpu_temperature) . "</td></tr>";
