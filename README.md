@@ -39,7 +39,14 @@ checkup.php?showtraffic=m
 ```
 
 ## Raspberry Pi
+### Temperature
 If when running `vcgencmd` on a **raspberry pi** you get VCHI initialization failed then you need to add the video group to your user. The `vcgencmd` tool requires you have this group role so without it, it will give `VCHI initialization failed` error.
 ```
 sudo usermod -aG video www-data
+```
+### Netstat
+If `Service status` shows empty column **Service** for many rows then do: `sudo visudo`
+add line
+```
+www-data ALL=(ALL) NOPASSWD:/bin/netstat
 ```
